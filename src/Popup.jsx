@@ -7,11 +7,14 @@ import Trash from "./components/Trash";
 import Copy from "./components/Copy";
 import Tick from "./components/Tick";
 import Modal from "./components/Modal";
+import More from "./components/More";
+import MoreModal from "./components/MoreModal";
 
 export default function Popup() {
   const [formData, setFormData] = useState({});
   const [customFields, setCustomFields] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showMoreModal, setShowMoreModal] = useState(false);
   const [modalLabel, setModalLabel] = useState("");
   const [modalValue, setModalValue] = useState("");
   const [removedKeys, setRemovedKeys] = useState(new Set());
@@ -266,14 +269,25 @@ export default function Popup() {
   }, []);
 
   return (
-    <div className="m-4 p-0 bg-white border border-black rounded-md">
+    <div className="m-3 p-0 bg-white border border-black rounded-md">
       <div className="bg-white p-1 w-[360px] m-2.5">
         {/* Header */}
-        <h1 className="text-[18px] font-semibold m-0 mb-1 text-[#0f172a]">
-          Autofill Google Forms
-        </h1>
-        <div className="text-[12px] text-gray-500 mb-2.5 w-[75%]">
-          Save your details once and reuse them across similar google forms.
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex-1">
+            <h1 className="text-[18px] font-semibold m-0 mb-1 text-[#0f172a]">
+              Autofill Google Forms
+            </h1>
+            <div className="text-[12px] text-gray-500 mb-2.5 w-[85%]">
+              Save your details once and reuse them across similar google forms.
+            </div>
+          </div>
+          <button
+            onClick={() => setShowMoreModal(true)}
+            className="border-none bg-transparent text-[#0f172a] cursor-pointer p-2 flex items-center justify-center w-8 h-8 rounded-md transition-colors duration-200 hover:bg-[rgba(15,23,42,0.1)]"
+            title="More options"
+          >
+            <More />
+          </button>
         </div>
 
         {/* Primary action button */}
@@ -436,6 +450,16 @@ export default function Popup() {
             onLabelChange={(e) => setModalLabel(e.target.value)}
             onValueChange={(e) => setModalValue(e.target.value)}
             onAdd={handleAddCustom}
+          />
+        )}
+
+        {/* more modal */}
+        {showMoreModal && (
+          <MoreModal
+            onClose={() => setShowMoreModal(false)}
+            formData={formData}
+            customFields={customFields}
+            fields={FIELDS}
           />
         )}
       </div>

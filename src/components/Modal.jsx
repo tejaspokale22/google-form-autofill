@@ -57,7 +57,7 @@ export default function Modal({
             onClick={onClose}
             className="py-2 px-3.5 rounded-md border-none text-[12px] font-medium cursor-pointer transition-all duration-150 bg-[#e2e8f0] text-[#475569] hover:bg-[#cbd5e1]"
           >
-            cancel
+            close
           </button>
           <button
             id="modalConfirmBtn"

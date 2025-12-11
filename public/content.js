@@ -1,5 +1,3 @@
-// content.js - final version
-// Normalization utilities
 function normalizeLabel(text) {
   return (text || "")
     .toLowerCase()
@@ -26,7 +24,8 @@ function getKeyFromLabel(rawLabel) {
 
   if (label.includes("technical achievement")) return "techAchievements";
   if (label.includes("personal achievement")) return "personalAchievements";
-  if (label.includes("project") && !label.includes("competition")) return "projects";
+  if (label.includes("project") && !label.includes("competition"))
+    return "projects";
 
   if (label.includes("email")) return "email";
   if (label.includes("prn")) return "prn";
@@ -40,7 +39,11 @@ function getKeyFromLabel(rawLabel) {
   )
     return "fullName";
 
-  if (label.includes("date of birth") || label.includes("dob") || label.includes("birth date"))
+  if (
+    label.includes("date of birth") ||
+    label.includes("dob") ||
+    label.includes("birth date")
+  )
     return "dob";
 
   if (
@@ -62,9 +65,19 @@ function getKeyFromLabel(rawLabel) {
   )
     return "college";
 
-  if (label.includes("course") || label === "degree" || label.includes("ug course")) return "course";
+  if (
+    label.includes("course") ||
+    label === "degree" ||
+    label.includes("ug course")
+  )
+    return "course";
 
-  if (label.includes("branch") || label.includes("specialization") || label.includes("stream")) return "branch";
+  if (
+    label.includes("branch") ||
+    label.includes("specialization") ||
+    label.includes("stream")
+  )
+    return "branch";
 
   if (
     label.includes("year of passing") ||
@@ -74,9 +87,19 @@ function getKeyFromLabel(rawLabel) {
   )
     return "passYear";
 
-  if (label.includes("10th") || label.includes("ssc") || label.includes("class 10")) return "tenthPercent";
+  if (
+    label.includes("10th") ||
+    label.includes("ssc") ||
+    label.includes("class 10")
+  )
+    return "tenthPercent";
 
-  if (label.includes("12th") || label.includes("hsc") || label.includes("class 12")) return "twelfthPercent";
+  if (
+    label.includes("12th") ||
+    label.includes("hsc") ||
+    label.includes("class 12")
+  )
+    return "twelfthPercent";
 
   if (label.includes("diploma")) return "diplomaPercent";
 
@@ -90,19 +113,42 @@ function getKeyFromLabel(rawLabel) {
 
   if (label.includes("cocubes")) return "cocubesScore";
 
-  if (label.includes("hacker rank rating") || label.includes("hackerrank rating")) return "hackerrankRating";
-  if ((label.includes("hacker rank") || label.includes("hackerrank")) && label.includes("link")) return "hackerrankLink";
+  if (
+    label.includes("hacker rank rating") ||
+    label.includes("hackerrank rating")
+  )
+    return "hackerrankRating";
+  if (
+    (label.includes("hacker rank") || label.includes("hackerrank")) &&
+    label.includes("link")
+  )
+    return "hackerrankLink";
 
-  if (label.includes("leetcode score") || label === "leetcode") return "leetcodeScore";
-  if (label.includes("leetcode") && label.includes("link")) return "leetcodeLink";
+  if (label.includes("leetcode score") || label === "leetcode")
+    return "leetcodeScore";
+  if (label.includes("leetcode") && label.includes("link"))
+    return "leetcodeLink";
 
   if (label.includes("codechef rating")) return "codechefRating";
-  if (label.includes("codechef") && label.includes("link")) return "codechefLink";
+  if (label.includes("codechef") && label.includes("link"))
+    return "codechefLink";
 
-  if (label.includes("hacker earth rating") || label.includes("hackerearth rating")) return "hackerearthRating";
-  if ((label.includes("hacker earth") || label.includes("hackerearth")) && label.includes("link")) return "hackerearthLink";
+  if (
+    label.includes("hacker earth rating") ||
+    label.includes("hackerearth rating")
+  )
+    return "hackerearthRating";
+  if (
+    (label.includes("hacker earth") || label.includes("hackerearth")) &&
+    label.includes("link")
+  )
+    return "hackerearthLink";
 
-  if (label.includes("core skills") || label === "core skills" || (label.includes("skills") && label.includes("core")))
+  if (
+    label.includes("core skills") ||
+    label === "core skills" ||
+    (label.includes("skills") && label.includes("core"))
+  )
     return "coreSkill";
 
   return null;
@@ -129,16 +175,20 @@ function getProfileValue(key, profile) {
 // Auto-check "record email" checkbox anywhere on the page
 function autoCheckEmailBox() {
   try {
-    const candidates = Array.from(document.querySelectorAll('[role="checkbox"], input[type="checkbox"]'));
+    const candidates = Array.from(
+      document.querySelectorAll('[role="checkbox"], input[type="checkbox"]')
+    );
     for (const el of candidates) {
       const aria = (el.getAttribute && el.getAttribute("aria-label")) || "";
-      const nearby = (el.innerText || el.parentElement?.innerText || "").toString() || "";
+      const nearby =
+        (el.innerText || el.parentElement?.innerText || "").toString() || "";
       const combined = (aria + " " + nearby).toLowerCase();
 
       if (
         (combined.includes("record") && combined.includes("email")) ||
         (combined.includes("collect") && combined.includes("email")) ||
-        (combined.includes("include with my response") && combined.includes("email"))
+        (combined.includes("include with my response") &&
+          combined.includes("email"))
       ) {
         const checked = el.getAttribute && el.getAttribute("aria-checked");
         const isChecked = checked === "true" || el.checked === true;
@@ -146,7 +196,9 @@ function autoCheckEmailBox() {
           try {
             el.click();
           } catch (e) {
-            el.parentElement && el.parentElement.click && el.parentElement.click();
+            el.parentElement &&
+              el.parentElement.click &&
+              el.parentElement.click();
           }
         }
         return true;
@@ -164,7 +216,9 @@ function fillQuestionElement(questionEl, key, value) {
 
   const dateInput = questionEl.querySelector("input[type='date']");
   const textarea = questionEl.querySelector("textarea");
-  const input = questionEl.querySelector("input[type='text'], input[type='email'], input[type='number'], input[type='url']");
+  const input = questionEl.querySelector(
+    "input[type='text'], input[type='email'], input[type='number'], input[type='url']"
+  );
   const radioGroup = questionEl.querySelector('[role="radiogroup"]');
   const listbox = questionEl.querySelector('[role="listbox"]');
 
@@ -178,14 +232,26 @@ function fillQuestionElement(questionEl, key, value) {
   // Google custom dropdown/listbox handling (opens and picks an option)
   if (listbox) {
     const target = normalizeSoft(value);
-    try { listbox.click(); } catch (e) {}
+    try {
+      listbox.click();
+    } catch (e) {}
     setTimeout(() => {
-      const opts = Array.from(document.querySelectorAll('[role="option"], [role="menuitem"], [role="radio"]'));
+      const opts = Array.from(
+        document.querySelectorAll(
+          '[role="option"], [role="menuitem"], [role="radio"]'
+        )
+      );
       for (const opt of opts) {
         const label = normalizeSoft(getOptionLabelText(opt));
         if (!label) continue;
-        if (label === target || label.includes(target) || target.includes(label)) {
-          try { opt.click(); } catch (e) {
+        if (
+          label === target ||
+          label.includes(target) ||
+          target.includes(label)
+        ) {
+          try {
+            opt.click();
+          } catch (e) {
             opt.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
             opt.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
           }
@@ -202,7 +268,11 @@ function fillQuestionElement(questionEl, key, value) {
   if (radioGroup) {
     const opts = Array.from(radioGroup.querySelectorAll('[role="radio"]'));
     const targetSoft = normalizeSoft(value);
-    const ratingKeys = ["hackerrankRating", "codechefRating", "hackerearthRating"];
+    const ratingKeys = [
+      "hackerrankRating",
+      "codechefRating",
+      "hackerearthRating",
+    ];
 
     if (key === "gender") {
       const first = (targetSoft && targetSoft[0]) || "";
@@ -236,7 +306,11 @@ function fillQuestionElement(questionEl, key, value) {
     for (const opt of opts) {
       const label = normalizeSoft(getOptionLabelText(opt) || "");
       if (!label) continue;
-      if (label === targetSoft || label.includes(targetSoft) || targetSoft.includes(label)) {
+      if (
+        label === targetSoft ||
+        label.includes(targetSoft) ||
+        targetSoft.includes(label)
+      ) {
         opt.click();
         return;
       }
@@ -296,12 +370,24 @@ function autofillFromProfile(profile, customFields) {
         if (key === "email") {
           setTimeout(() => {
             // try clicking checkbox inside the same question if present
-            const emailCheckbox = q.querySelector('[role="checkbox"], input[type="checkbox"]');
+            const emailCheckbox = q.querySelector(
+              '[role="checkbox"], input[type="checkbox"]'
+            );
             if (emailCheckbox) {
-              const cbLabel = (emailCheckbox.getAttribute && emailCheckbox.getAttribute("aria-label")) || (emailCheckbox.parentElement?.innerText || "");
+              const cbLabel =
+                (emailCheckbox.getAttribute &&
+                  emailCheckbox.getAttribute("aria-label")) ||
+                emailCheckbox.parentElement?.innerText ||
+                "";
               const combined = (cbLabel || "").toLowerCase();
               if (combined.includes("record") && combined.includes("email")) {
-                try { emailCheckbox.click(); } catch (e) { emailCheckbox.parentElement && emailCheckbox.parentElement.click && emailCheckbox.parentElement.click(); }
+                try {
+                  emailCheckbox.click();
+                } catch (e) {
+                  emailCheckbox.parentElement &&
+                    emailCheckbox.parentElement.click &&
+                    emailCheckbox.parentElement.click();
+                }
               }
             }
           }, 80);
@@ -349,32 +435,54 @@ function resetForm() {
 
     const radioGroups = q.querySelectorAll('[role="radiogroup"]');
     radioGroups.forEach((group) => {
-      const checkedRadio = group.querySelector('[role="radio"][aria-checked="true"]');
+      const checkedRadio = group.querySelector(
+        '[role="radio"][aria-checked="true"]'
+      );
       if (checkedRadio) {
-        try { checkedRadio.click(); } catch (e) {}
+        try {
+          checkedRadio.click();
+        } catch (e) {}
       }
     });
 
-    const checkboxes = q.querySelectorAll('[role="checkbox"][aria-checked="true"], input[type="checkbox"]:checked');
+    const checkboxes = q.querySelectorAll(
+      '[role="checkbox"][aria-checked="true"], input[type="checkbox"]:checked'
+    );
     checkboxes.forEach((cb) => {
-      try { cb.click(); } catch (e) { cb.checked = false; }
+      try {
+        cb.click();
+      } catch (e) {
+        cb.checked = false;
+      }
     });
 
     const selects = q.querySelectorAll("select");
     selects.forEach((sel) => {
-      try { sel.selectedIndex = 0; sel.dispatchEvent(new Event("change", { bubbles: true })); } catch (e) {}
+      try {
+        sel.selectedIndex = 0;
+        sel.dispatchEvent(new Event("change", { bubbles: true }));
+      } catch (e) {}
     });
   });
 
   // Also try to uncheck document-level email box if present
   setTimeout(() => {
-    const candidates = Array.from(document.querySelectorAll('[role="checkbox"][aria-checked="true"], input[type="checkbox"]:checked'));
+    const candidates = Array.from(
+      document.querySelectorAll(
+        '[role="checkbox"][aria-checked="true"], input[type="checkbox"]:checked'
+      )
+    );
     candidates.forEach((el) => {
       const aria = (el.getAttribute && el.getAttribute("aria-label")) || "";
-      const nearby = (el.innerText || el.parentElement?.innerText || "").toString() || "";
+      const nearby =
+        (el.innerText || el.parentElement?.innerText || "").toString() || "";
       const combined = (aria + " " + nearby).toLowerCase();
       if (combined.includes("record") && combined.includes("email")) {
-        try { el.click(); } catch (e) { el.checked = false; }
+        try {
+          el.click();
+        } catch (e) {
+          el.checked = false;
+        }
       }
     });
   }, 120);
@@ -385,11 +493,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "FILL_FORM") {
     chrome.storage.sync.get(["profile", "customFields"], (result) => {
       try {
-        const fillResult = autofillFromProfile(result.profile, result.customFields || []);
+        const fillResult = autofillFromProfile(
+          result.profile,
+          result.customFields || []
+        );
         sendResponse(fillResult);
       } catch (err) {
         console.error("autofill error", err);
-        sendResponse({ success: false, message: "autofill failed (see console)" });
+        sendResponse({
+          success: false,
+          message: "autofill failed (see console)",
+        });
       }
     });
     // indicate async response

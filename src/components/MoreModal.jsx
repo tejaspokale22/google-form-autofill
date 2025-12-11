@@ -1,8 +1,23 @@
-import React from "react";
+import { useState } from "react";
 import ExportJSON from "./options/ExportJSON";
 import ExportPDF from "./options/ExportPDF";
+import ImportJSON from "./options/ImportJSON";
 
-export default function MoreModal({ onClose, formData, customFields, fields }) {
+export default function MoreModal({
+  onClose,
+  formData,
+  customFields,
+  fields,
+  onImportFields,
+}) {
+  const [importStatus, setImportStatus] = useState("");
+
+  const handleImport = (fields, message) => {
+    setImportStatus(message);
+    onImportFields(fields);
+    setTimeout(() => setImportStatus(""), 3000);
+  };
+
   return (
     <div
       className="fixed z-1001 left-0 top-0 w-full h-full bg-[rgba(0,0,0,0.4)] flex items-center justify-center"
@@ -29,7 +44,12 @@ export default function MoreModal({ onClose, formData, customFields, fields }) {
             customFields={customFields}
             fields={fields}
           />
-
+          <ImportJSON onImport={handleImport} />
+          {importStatus && (
+            <div className="text-[12px] text-[#16a34a] text-center py-1">
+              {importStatus}
+            </div>
+          )}
           <button
             onClick={onClose}
             className="w-full py-2.5 px-3 rounded-lg border-none text-[12px] font-medium cursor-pointer transition-all duration-200 bg-[#f1f5f9] text-[#475569] hover:bg-[#e2e8f0] mt-2"

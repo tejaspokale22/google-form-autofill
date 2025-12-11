@@ -102,6 +102,27 @@ export default function Popup() {
     setShowModal(false);
   };
 
+  const handleImportFields = (importedFields) => {
+    if (!importedFields || importedFields.length === 0) return;
+
+    // Merge with existing custom fields, avoiding duplicates with both standard and custom fields
+    setCustomFields((prevFields) => {
+      // Collect all existing labels (both standard fields and custom fields)
+      const existingLabels = new Set([
+        ...FIELDS.map((f) => f.label.toLowerCase()),
+        ...prevFields.map((f) => f.labelKeyword.toLowerCase()),
+      ]);
+
+      // Filter out imported fields that match existing labels
+      const newFields = importedFields.filter(
+        (field) => !existingLabels.has(field.labelKeyword.toLowerCase())
+      );
+
+      // Add all new fields to the bottom
+      return [...prevFields, ...newFields];
+    });
+  };
+
   const removeCustom = (i) =>
     setCustomFields((p) => p.filter((_, idx) => idx !== i));
 
@@ -129,23 +150,25 @@ export default function Popup() {
   };
 
   const handleSave = () => {
-    let hasData = false;
+    // Check if any visible standard fields exist
+    const visibleStandardFields = FIELDS.filter((f) => !removedKeys.has(f.key));
+    const hasVisibleFields =
+      visibleStandardFields.length > 0 || customFields.length > 0;
 
-    // Check standard fields
-    Object.values(formData).forEach((value) => {
-      if (value && value.trim()) hasData = true;
-    });
-
-    // Check custom fields
-    const validCustomFields = customFields.filter(
-      (field) => field.labelKeyword && field.value
-    );
-    if (validCustomFields.length > 0) hasData = true;
-
-    if (!hasData) {
-      showStatus(status, "please fill at least one field before saving", 1600);
+    // Only show error if NO fields are visible at all
+    if (!hasVisibleFields) {
+      showStatus(
+        setStatus,
+        "please add at least one field before saving",
+        1600
+      );
       return;
     }
+
+    // Filter valid custom fields for saving (must have labelKeyword)
+    const validCustomFields = customFields.filter(
+      (field) => field.labelKeyword && field.labelKeyword.trim()
+    );
 
     if (typeof chrome !== "undefined" && chrome.storage) {
       chrome.storage.sync.get(["hiddenStandardFields"], (res) => {
@@ -311,87 +334,101 @@ export default function Popup() {
 
         {/* Fields list */}
         <div className="mb-2 pb-1.5">
-          {FIELDS.map((f) =>
-            !removedKeys.has(f.key) ? (
-              <div key={f.key} className="mb-2.5">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <label className="text-[11px] text-[#0f172a] m-0">
-                    {f.label}
-                  </label>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(f.key, formData[f.key])}
-                      className="border-none bg-transparent text-[#0f172a] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(15,23,42,0.1)]"
-                      title="Copy"
-                    >
-                      {copiedField === f.key ? <Tick /> : <Copy />}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveField(f.key)}
-                      className="border-none bg-transparent text-[#dc2626] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(220,38,38,0.1)]"
-                      title="Remove"
-                    >
-                      <Trash />
-                    </button>
-                  </div>
-                </div>
+          {FIELDS.filter((f) => !removedKeys.has(f.key)).length === 0 &&
+          customFields.length === 0 ? (
+            <div className="text-center py-2 px-4">
+              <p className="text-[13px] text-gray-400 mb-2">
+                no fields available
+              </p>
+              <p className="text-[11px] text-gray-400">
+                add custom fields or import from JSON to get started
+              </p>
+            </div>
+          ) : (
+            <>
+              {FIELDS.map((f) =>
+                !removedKeys.has(f.key) ? (
+                  <div key={f.key} className="mb-2.5">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <label className="text-[11px] text-[#0f172a] m-0">
+                        {f.label}
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(f.key, formData[f.key])}
+                          className="border-none bg-transparent text-[#0f172a] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(15,23,42,0.1)]"
+                          title="Copy"
+                        >
+                          {copiedField === f.key ? <Tick /> : <Copy />}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveField(f.key)}
+                          className="border-none bg-transparent text-[#dc2626] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(220,38,38,0.1)]"
+                          title="Remove"
+                        >
+                          <Trash />
+                        </button>
+                      </div>
+                    </div>
 
-                {f.textarea ? (
-                  <textarea
-                    id={f.key}
-                    value={formData[f.key] || ""}
-                    onChange={(e) => handleChange(f.key, e.target.value)}
-                    className="w-full py-[7px] px-2 text-[12px] rounded-md border border-[#e2e8f0] outline-none bg-[#f9fafb] resize-y min-h-[50px] focus:border-[#0f172a] focus:bg-white"
-                  />
-                ) : (
-                  <input
-                    id={f.key}
-                    value={formData[f.key] || ""}
-                    onChange={(e) => handleChange(f.key, e.target.value)}
-                    className="w-full py-[7px] px-2 text-[12px] rounded-md border border-[#e2e8f0] outline-none bg-[#f9fafb] focus:border-[#0f172a] focus:bg-white"
-                  />
-                )}
+                    {f.textarea ? (
+                      <textarea
+                        id={f.key}
+                        value={formData[f.key] || ""}
+                        onChange={(e) => handleChange(f.key, e.target.value)}
+                        className="w-full py-[7px] px-2 text-[12px] rounded-md border border-[#e2e8f0] outline-none bg-[#f9fafb] resize-y min-h-[50px] focus:border-[#0f172a] focus:bg-white"
+                      />
+                    ) : (
+                      <input
+                        id={f.key}
+                        value={formData[f.key] || ""}
+                        onChange={(e) => handleChange(f.key, e.target.value)}
+                        className="w-full py-[7px] px-2 text-[12px] rounded-md border border-[#e2e8f0] outline-none bg-[#f9fafb] focus:border-[#0f172a] focus:bg-white"
+                      />
+                    )}
+                  </div>
+                ) : null
+              )}
+
+              {/* custom fields */}
+              <div id="customList">
+                {customFields.map((c, i) => (
+                  <div key={i} className="mb-2.5">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] text-[#0f172a] m-0">
+                        {c.labelKeyword}
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(`custom-${i}`, c.value)}
+                          className="border-none bg-transparent text-[#0f172a] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(15,23,42,0.1)]"
+                          title="Copy"
+                        >
+                          {copiedField === `custom-${i}` ? <Tick /> : <Copy />}
+                        </button>
+                        <button
+                          onClick={() => removeCustom(i)}
+                          className="border-none bg-transparent text-[#dc2626] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(220,38,38,0.1)]"
+                          type="button"
+                          title="Remove"
+                        >
+                          <Trash />
+                        </button>
+                      </div>
+                    </div>
+                    <input
+                      value={c.value}
+                      onChange={(e) => updateCustomField(i, e.target.value)}
+                      className="w-full py-[7px] px-2 text-[12px] rounded-md border border-[#e2e8f0] outline-none bg-[#f9fafb] focus:border-[#0f172a] focus:bg-white"
+                    />
+                  </div>
+                ))}
               </div>
-            ) : null
+            </>
           )}
-
-          {/* custom fields */}
-          <div id="customList">
-            {customFields.map((c, i) => (
-              <div key={i} className="mb-2.5">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] text-[#0f172a] m-0">
-                    {c.labelKeyword}
-                  </label>
-                  <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(`custom-${i}`, c.value)}
-                      className="border-none bg-transparent text-[#0f172a] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(15,23,42,0.1)]"
-                      title="Copy"
-                    >
-                      {copiedField === `custom-${i}` ? <Tick /> : <Copy />}
-                    </button>
-                    <button
-                      onClick={() => removeCustom(i)}
-                      className="border-none bg-transparent text-[#dc2626] cursor-pointer p-0.5 flex items-center justify-center w-5 h-5 rounded transition-colors duration-200 hover:bg-[rgba(220,38,38,0.1)]"
-                      type="button"
-                      title="Remove"
-                    >
-                      <Trash />
-                    </button>
-                  </div>
-                </div>
-                <input
-                  value={c.value}
-                  onChange={(e) => updateCustomField(i, e.target.value)}
-                  className="w-full py-[7px] px-2 text-[12px] rounded-md border border-[#e2e8f0] outline-none bg-[#f9fafb] focus:border-[#0f172a] focus:bg-white"
-                />
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* add custom field */}
@@ -460,6 +497,7 @@ export default function Popup() {
             formData={formData}
             customFields={customFields}
             fields={FIELDS}
+            onImportFields={handleImportFields}
           />
         )}
       </div>

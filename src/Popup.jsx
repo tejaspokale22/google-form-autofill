@@ -44,7 +44,7 @@ export default function Popup() {
     { key: "codechefLink", label: "codechef profile link" },
     { key: "hackerearthRating", label: "hackerearth rating (0-5)" },
     { key: "hackerearthLink", label: "hackerearth profile link" },
-    { key: "projects", label: "projects" },
+    { key: "projects", label: "projects", textarea: true },
     {
       key: "techAchievements",
       label: "technical achievements",
@@ -266,7 +266,7 @@ export default function Popup() {
   }, []);
 
   return (
-    <div className="m-1.5 p-0 bg-white border border-black rounded-md">
+    <div className="m-4 p-0 bg-white border border-black rounded-md">
       <div className="bg-white p-1 w-[360px] m-2.5">
         {/* Header */}
         <h1 className="text-[18px] font-semibold m-0 mb-1 text-[#0f172a]">
@@ -289,7 +289,7 @@ export default function Popup() {
           </button>
           <div
             id="fillStatus"
-            className="mt-1.5 text-[11px] text-center text-[#16a34a] min-h-3.5"
+            className="mt-1.5 text-[13px] text-center text-[#16a34a] min-h-3.5"
           >
             {fillStatus}
           </div>
@@ -386,7 +386,7 @@ export default function Popup() {
             id="addCustomBtn"
             type="button"
             onClick={() => setShowModal(true)}
-            className="text-[12px] py-2.5 px-3 rounded-lg border-none bg-[#3b82f6] text-white cursor-pointer font-medium transition-all duration-200 hover:bg-[#2563eb] w-full flex items-center justify-center"
+            className="text-[12px] py-2.5 px-3 rounded-lg border-2 border-dashed border-[#3b82f6] bg-[#eff6ff] text-[#3b82f6] cursor-pointer font-medium transition-all duration-200 hover:bg-[#dbeafe] w-full flex items-center justify-center gap-2"
           >
             <Add />
             add custom field
@@ -409,7 +409,7 @@ export default function Popup() {
             id="resetBtn"
             type="button"
             onClick={handleReset}
-            className="w-full py-2.5 px-2.5 rounded-lg border-none text-[12px] font-medium cursor-pointer transition-all duration-200 bg-[#fc0505] text-white hover:bg-[#ff3a3a] flex items-center justify-center gap-2.5"
+            className="w-full py-2.5 px-2.5 rounded-lg border-2 border-[#dc2626] text-[12px] font-medium cursor-pointer transition-all duration-200 bg-white text-[#dc2626] hover:bg-[#fee2e2] hover:border-solid flex items-center justify-center gap-2.5"
           >
             <Reset />
             reset google form
@@ -417,7 +417,7 @@ export default function Popup() {
 
           <div
             id="status"
-            className="mt-1.5 text-[11px] text-center text-[#16a34a] min-h-3.5"
+            className="mt-1.5 text-[13px] text-center text-[#16a34a] min-h-3.5"
           >
             {status}
           </div>

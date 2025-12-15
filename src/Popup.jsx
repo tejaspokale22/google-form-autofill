@@ -9,6 +9,7 @@ import Modal from "./components/Modal";
 import More from "./components/More";
 import MoreModal from "./components/MoreModal";
 import { FIELDS } from "./constants";
+import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 
 export default function Popup() {
   const [formData, setFormData] = useState({});
@@ -217,6 +218,15 @@ export default function Popup() {
     }
   }, []);
 
+  // Keyboard shortcuts
+  useKeyboardShortcuts(
+    {
+      onSave: handleSave,
+      onAutofill: handleFill,
+    },
+    [formData, customFields, removedKeys]
+  );
+
   return (
     <div className="m-2 bg-white border border-black rounded-md overflow-hidden h-[570px]">
       <div className="w-[380px] flex flex-col h-full">
@@ -224,12 +234,17 @@ export default function Popup() {
         <div className="p-3 border-b border-black shrink-0 bg-black/5">
           <div className="flex items-center justify-between mb-2">
             <div className="flex-1">
-              <h1 className="text-[20px] font-semibold m-0 mb-1 text-[#0f172a]">
-                Autofill Google Forms
-              </h1>
+              <div className="flex items-center justify-between mb-1">
+                <h1 className="text-[20px] font-semibold m-0 text-[#0f172a]">
+                  Autofill Google Forms{" "}
+                </h1>
+              </div>
               <div className="text-[12px] text-gray-500 mb-0 w-[85%]">
                 Save your details once and reuse them across similar google
-                forms.
+                forms.{" "}
+                <span className="text-[10px] text-gray-500 py-0.5 rounded">
+                  <i>(ctrl + I)</i>
+                </span>
               </div>
             </div>
             <button
@@ -245,6 +260,7 @@ export default function Popup() {
           <div className="flex flex-col gap-2">
             <button
               id="fillBtn"
+              title="ctrl + L"
               type="button"
               onClick={handleFill}
               className="w-full py-2 rounded-md border-none text-[13px] font-semibold cursor-pointer bg-[#00b176] text-white transition-all duration-200 hover:bg-[#059669] flex items-center justify-center gap-2"
@@ -368,7 +384,7 @@ export default function Popup() {
               id="addCustomBtn"
               type="button"
               onClick={() => setShowModal(true)}
-              className="text-[12px] py-0.5 rounded-xl border border-[#3b82f6] bg-[#eff6ff] text-[#3b82f6] cursor-pointer font-medium transition-all duration-200 hover:bg-[#dbeafe] w-full flex items-center justify-center gap-2"
+              className="text-[12px] py-1 rounded-xl border border-[#3b82f6] bg-[#eff6ff] text-[#3b82f6] cursor-pointer font-medium transition-all duration-200 hover:bg-[#dbeafe] w-full flex items-center justify-center gap-2"
             >
               <Add />
               add custom field
@@ -379,6 +395,7 @@ export default function Popup() {
           <div className="flex flex-col gap-2">
             <button
               id="saveBtn"
+              title="ctrl + S"
               type="button"
               onClick={handleSave}
               className="w-full py-1.5 rounded-md border-none text-[12px] font-medium cursor-pointer transition-all duration-200 bg-[#101010] text-white hover:bg-[#404040] flex items-center justify-center gap-2.5"

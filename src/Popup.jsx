@@ -72,24 +72,80 @@ export default function Popup() {
     setShowModal(false);
   };
 
-  const handleImportFields = (importedFields, totalInFile) => {
+  const handleImportFields = (importedFields) => {
     if (!importedFields || importedFields.length === 0) return 0;
 
-    const existingLabels = new Set([
-      ...FIELDS.filter((f) => !removedKeys.has(f.key)).map((f) =>
-        f.label.toLowerCase()
-      ),
-      ...customFields.map((f) => f.labelKeyword.toLowerCase()),
-    ]);
+    // map of existing fields → { type, key/index, value }
+    const existingFieldMap = new Map();
 
-    const newFields = importedFields.filter(
-      (field) => !existingLabels.has(field.labelKeyword.toLowerCase())
-    );
+    // standard fields
+    FIELDS.forEach((f) => {
+      if (!removedKeys.has(f.key)) {
+        const value = formData[f.key];
+        existingFieldMap.set(f.label.toLowerCase(), {
+          type: "standard",
+          key: f.key,
+          value: value || "",
+        });
+      }
+    });
 
-    const duplicateCount = importedFields.length - newFields.length;
+    // custom fields
+    customFields.forEach((f, idx) => {
+      existingFieldMap.set(f.labelKeyword.toLowerCase(), {
+        type: "custom",
+        index: idx,
+        value: f.value || "",
+      });
+    });
 
+    let duplicateCount = 0;
+    const newFields = [];
+    const updatedStandardFields = {};
+    const customFieldUpdates = new Map();
+
+    importedFields.forEach((field) => {
+      const label = field.labelKeyword.toLowerCase();
+      const existing = existingFieldMap.get(label);
+
+      if (existing) {
+        // Field exists
+        if (existing.value.trim().length > 0) {
+          // Has value - consider duplicate
+          duplicateCount++;
+        } else {
+          // Empty value - update with imported value
+          if (existing.type === "standard") {
+            updatedStandardFields[existing.key] = field.value;
+          } else {
+            customFieldUpdates.set(existing.index, field.value);
+          }
+        }
+      } else {
+        // Field doesn't exist - add as new
+        newFields.push(field);
+      }
+    });
+
+    // Apply updates to standard fields
+    if (Object.keys(updatedStandardFields).length > 0) {
+      setFormData((prev) => ({ ...prev, ...updatedStandardFields }));
+    }
+
+    // Apply updates to custom fields
+    if (customFieldUpdates.size > 0) {
+      setCustomFields((prev) =>
+        prev.map((field, idx) =>
+          customFieldUpdates.has(idx)
+            ? { ...field, value: customFieldUpdates.get(idx) }
+            : field
+        )
+      );
+    }
+
+    // Add new fields as custom fields
     if (newFields.length > 0) {
-      setCustomFields((prevFields) => [...prevFields, ...newFields]);
+      setCustomFields((prev) => [...prev, ...newFields]);
     }
 
     return duplicateCount;
@@ -110,7 +166,7 @@ export default function Popup() {
     try {
       await navigator.clipboard.writeText(value);
       setCopiedField(fieldKey);
-      setTimeout(() => setCopiedField(null), 2000);
+      setTimeout(() => setCopiedField(null), 1600);
     } catch (err) {
       console.error("Failed to copy:", err);
     }

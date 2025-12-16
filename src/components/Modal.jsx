@@ -25,6 +25,9 @@ export default function Modal({
           <div className="flex flex-col gap-1">
             <label className="text-[11px] font-medium text-[#0f172a]">
               field label
+              <span className="block text-[10px] text-gray-500 font-normal mt-0.5">
+                Tip: use meaningful names
+              </span>
             </label>
             <input
               id="modalLabelInput"

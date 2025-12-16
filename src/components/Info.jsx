@@ -8,8 +8,8 @@ export default function Info() {
       stroke-linecap="round"
       stroke-linejoin="round"
       id="Info--Streamline-Lucide"
-      height="24"
-      width="24"
+      height="16"
+      width="16"
       aria-label="view JSON format"
     >
       <desc>Info Streamline Icon: https://streamlinehq.com</desc>

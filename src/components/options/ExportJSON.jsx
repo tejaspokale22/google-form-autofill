@@ -29,11 +29,7 @@ export default function ExportJSON({ formData, customFields, fields }) {
     }
 
     // Create formatted JSON with metadata
-    const exportData = {
-      exportedAt: new Date().toISOString(),
-      totalFields: Object.keys(filledData).length,
-      profile: filledData,
-    };
+    const exportData = filledData;
 
     // Create and download JSON file
     const dataStr = JSON.stringify(exportData, null, 2);

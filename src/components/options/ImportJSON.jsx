@@ -51,11 +51,7 @@ export default function ImportJSON({ onImport }) {
 
       // Extract the profile data
       let profileData;
-      if (jsonData.profile && typeof jsonData.profile === "object") {
-        // Exported format with metadata
-        profileData = jsonData.profile;
-      } else if (typeof jsonData === "object" && !Array.isArray(jsonData)) {
-        // Simple key-value format
+      if (typeof jsonData === "object" && !Array.isArray(jsonData)) {
         profileData = jsonData;
       } else {
         showError("expected an object with label-value pairs");

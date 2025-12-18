@@ -4,15 +4,15 @@ export const FIELDS = [
   { key: "fullName", label: "full name" },
   { key: "dob", label: "date of birth" },
   { key: "mobile", label: "mobile number" },
-  { key: "gender", label: "gender" },
+  { key: "gender", label: "gender (male/female)" },
 
   { key: "college", label: "college name" },
-  { key: "degree", label: "degree" },
-  { key: "branch", label: "specialization / branch" },
-  { key: "passYear", label: "year of graduation" },
+  { key: "degree", label: "degree (BE/BTech/BSc/BCA)" },
+  { key: "branch", label: "specialization / branch (CSE/IT/ECE/Mech)" },
+  { key: "passYear", label: "year of graduation (2026/2027)" },
 
   { key: "tenthPercent", label: "10th %" },
-  { key: "twelfthPercent", label: "12th %" },
+  { key: "twelthPercent", label: "12th %" },
   { key: "diplomaPercent", label: "diploma %" },
   { key: "degreePercent", label: "be / btech %" },
 
@@ -47,15 +47,16 @@ export const FIELDS = [
   },
   {
     key: "cgpa",
-    label: "cgpa",
+    label: "cgpa (on a scale of 10)",
   },
 
   {
     key: "activeBacklogs",
-    label: "active backlogs",
+    label: "active backlogs (0/1/2)",
   },
   { key: "yearDown", label: "year down (yes/no)" },
 
+  { key: "technologies", label: "technologies / skills", textarea: true },
   { key: "projects", label: "projects", textarea: true },
   { key: "techAchievements", label: "technical achievements", textarea: true },
   {

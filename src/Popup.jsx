@@ -233,13 +233,25 @@ export default function Popup() {
         return;
       }
 
-      try {
+      const sendFillMessage = () => {
         chrome.tabs.sendMessage(tab.id, { action: "FILL_FORM" }, (response) => {
           if (chrome.runtime.lastError) {
-            showStatus(
-              setFillStatus,
-              "please refresh the google form page and try again",
-              1600
+            chrome.scripting.executeScript(
+              {
+                target: { tabId: tab.id },
+                files: ["content.js"],
+              },
+              () => {
+                if (chrome.runtime.lastError) {
+                  showStatus(
+                    setFillStatus,
+                    "failed to load. please refresh the page",
+                    1600
+                  );
+                } else {
+                  setTimeout(() => sendFillMessage(), 100);
+                }
+              }
             );
           } else if (response && !response.success) {
             showStatus(setFillStatus, response.message, 1600);
@@ -251,6 +263,10 @@ export default function Popup() {
             );
           }
         });
+      };
+
+      try {
+        sendFillMessage();
       } catch (e) {
         showStatus(
           setFillStatus,

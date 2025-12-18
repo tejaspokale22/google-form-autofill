@@ -1,4 +1,3 @@
-// keyword-based mapping
 const FIELD_KEYWORDS = {
   email: ["email"],
   prn: ["prn", "university prn"],
@@ -18,25 +17,83 @@ const FIELD_KEYWORDS = {
   college: ["college", "college name", "institute"],
 
   tenthPercent: ["10th", "ssc", "class 10", "10th %"],
-  twelfthPercent: ["12th", "hsc", "12th %"],
+  twelthPercent: ["12th", "hsc", "12th %"],
   diplomaPercent: ["diploma %", "diploma"],
-  degreePercent: ["be%", "btech%", "degree %", "be b tech"],
+  degreePercent: [
+    "be%",
+    "btech%",
+    "degree %",
+    "be b tech",
+    "graduation %",
+    "graduation aggregate",
+  ],
 
   passYear: ["year of graduation", "passing year", "passout"],
 
   cocubesScore: ["cocubes"],
 
-  codechefRating: ["codechef rating"],
-  codechefLink: ["codechef profile"],
+  codechefRating: [
+    "codechef rating",
+    "codechef rank",
+    "codechef stars",
+    "code chef rating",
+  ],
 
-  hackerrankRating: ["hackerrank rating", "hackerrank star"],
-  hackerrankLink: ["hackerrank profile"],
+  codechefLink: [
+    "codechef profile",
+    "codechef profile link",
+    "codechef url",
+    "code chef profile",
+    "link of codechef rating",
+    "link of code chef rating",
+  ],
 
-  leetcodeScore: ["leetcode score", "problem solved"],
-  leetcodeLink: ["leetcode profile"],
+  hackerrankRating: [
+    "hackerrank rating",
+    "hackerrank score",
+    "hackerrank stars",
+    "hacker rank rating",
+  ],
 
-  hackerearthRating: ["hackerearth rating"],
-  hackerearthLink: ["hackerearth profile"],
+  hackerrankLink: [
+    "hackerrank profile",
+    "hackerrank profile link",
+    "hackerrank url",
+    "hacker rank profile",
+    "link of hackerrank rating",
+    "link of hacker rank rating",
+  ],
+
+  leetcodeScore: [
+    "leetcode score",
+    "leetcode rating",
+    "leetcode problems solved",
+    "leetcode solved",
+  ],
+
+  leetcodeLink: [
+    "leetcode profile",
+    "leetcode profile link",
+    "leetcode url",
+    "leet code profile",
+    "link of leetcode score",
+    "link of leet code score",
+  ],
+
+  hackerearthRating: [
+    "hackerearth rating",
+    "hackerearth score",
+    "hacker earth rating",
+  ],
+
+  hackerearthLink: [
+    "hackerearth profile",
+    "hackerearth profile link",
+    "hackerearth url",
+    "hacker earth profile",
+    "link of hackerearth rating",
+    "link of hacker earth rating",
+  ],
 
   githubLink: ["github"],
   linkedinLink: ["linkedin"],
@@ -76,6 +133,13 @@ const FIELD_KEYWORDS = {
 
   yearDown: ["year down", "gap year"],
 
+  technologies: [
+    "technologies",
+    "skills",
+    "technical skills",
+    "tech stack",
+    "technology stack",
+  ],
   techAchievements: ["technical achievements"],
   personalAchievements: ["personal achievements"],
   projects: ["project"],
@@ -92,18 +156,23 @@ function normalize(text) {
 function getProfileKey(label) {
   const text = normalize(label);
 
-  const entries = Object.entries(FIELD_KEYWORDS).sort(
-    (a, b) =>
-      Math.max(...b[1].map((k) => k.length)) -
-      Math.max(...a[1].map((k) => k.length))
-  );
+  let bestMatch = null;
+  let longestMatchLength = 0;
 
-  for (const [key, keywords] of entries) {
-    if (keywords.some((k) => text.includes(k))) {
-      return key;
+  for (const [key, keywords] of Object.entries(FIELD_KEYWORDS)) {
+    for (const keyword of keywords) {
+      const normalizedKeyword = normalize(keyword);
+      if (
+        text.includes(normalizedKeyword) &&
+        normalizedKeyword.length > longestMatchLength
+      ) {
+        bestMatch = key;
+        longestMatchLength = normalizedKeyword.length;
+      }
     }
   }
-  return null;
+
+  return bestMatch;
 }
 
 function fillDropdown(question, value) {
@@ -154,7 +223,7 @@ function fillQuestion(question, value, key) {
       const text = normalize(
         radio.getAttribute("aria-label") || radio.textContent
       );
-      if (text === target || target.includes(text)) {
+      if (text === target || text.includes(target) || target.includes(text)) {
         radio.click();
         return;
       }
@@ -168,7 +237,7 @@ function fillQuestion(question, value, key) {
     return;
   }
 
-  const input = question.querySelector("input:not([type='file']), textarea");
+  const input = question.querySelector("input:not([type='file'])");
 
   if (input) {
     input.value = value;
@@ -177,6 +246,7 @@ function fillQuestion(question, value, key) {
 }
 
 function autofill(profile, customFields = []) {
+  let filledCount = 0;
   document.querySelectorAll(".Qr7Oae").forEach((question) => {
     const labelEl = question.querySelector(".M7eMe");
     if (!labelEl) return;
@@ -186,6 +256,7 @@ function autofill(profile, customFields = []) {
 
     if (key && profile[key]) {
       fillQuestion(question, profile[key], key);
+      filledCount++;
       return;
     }
 
@@ -197,10 +268,12 @@ function autofill(profile, customFields = []) {
 
       if (q.includes(f) || f.includes(q)) {
         fillQuestion(question, field.value);
+        filledCount++;
         break;
       }
     }
   });
+  return filledCount;
 }
 
 function resetGoogleForm() {
@@ -220,15 +293,18 @@ function resetGoogleForm() {
     .forEach((c) => c.click());
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === "FILL_FORM") {
     chrome.storage.sync.get(["profile", "customFields"], (result) => {
       try {
-        autofill(result.profile || {}, result.customFields || []);
-        sendResponse({ success: true });
+        const filledCount = autofill(
+          result.profile || {},
+          result.customFields || []
+        );
+        sendResponse({ success: true, filledCount });
       } catch (e) {
         console.error(e);
-        sendResponse({ success: false });
+        sendResponse({ success: false, filledCount: 0 });
       }
     });
     return true;

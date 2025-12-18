@@ -221,7 +221,7 @@ export default function Popup() {
       if (!tabs || !tabs[0]) {
         showStatus(
           setFillStatus,
-          "no active tab found. open the form tab",
+          "no active tab found. open the google form tab",
           1600
         );
         return;
@@ -239,10 +239,10 @@ export default function Popup() {
             showStatus(
               setFillStatus,
               "please refresh the google form page and try again",
-              2000
+              1600
             );
           } else if (response && !response.success) {
-            showStatus(setFillStatus, response.message, 2000);
+            showStatus(setFillStatus, response.message, 1600);
           } else if (response && response.success) {
             showStatus(
               setFillStatus,

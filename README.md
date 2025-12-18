@@ -83,19 +83,6 @@ See `sample-import.json` for an example of the JSON format:
 }
 ```
 
-## Installation
-
-1. Clone this repository
-2. Run `npm install`
-3. Run `npm run build`
-4. Load the `dist` folder as an unpacked extension in Chrome
-
-## Development
-
-```bash
-npm run dev
-```
-
 ## License
 
 MIT

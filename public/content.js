@@ -1,12 +1,3 @@
-// normalize text for comparison
-function normalize(text) {
-  return (text || "")
-    .toLowerCase()
-    .replace(/[\*\:\?\(\)\[\]\-_,]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 // keyword-based mapping
 const FIELD_KEYWORDS = {
   email: ["email"],
@@ -15,19 +6,20 @@ const FIELD_KEYWORDS = {
     "full name",
     "candidate name",
     "student name",
-    "name of candidate",
+    "name of the student",
+    "name of the candidate",
   ],
   mobile: ["mobile", "phone", "contact number", "10 digits"],
   dob: ["date of birth", "dob", "birth"],
   gender: ["gender"],
 
-  degree: ["degree"],
+  degree: ["degree", "course"],
   branch: ["specialization", "branch", "stream"],
   college: ["college", "college name", "institute"],
 
-  tenthPercent: ["10th", "ssc", "class 10"],
-  twelfthPercent: ["12th", "hsc", "12th %", "diploma"],
-  diplomaPercent: ["diploma %"],
+  tenthPercent: ["10th", "ssc", "class 10", "10th %"],
+  twelfthPercent: ["12th", "hsc", "12th %"],
+  diplomaPercent: ["diploma %", "diploma"],
   degreePercent: ["be%", "btech%", "degree %", "be b tech"],
 
   passYear: ["year of graduation", "passing year", "passout"],
@@ -89,18 +81,31 @@ const FIELD_KEYWORDS = {
   projects: ["project"],
 };
 
-// map label → profile key
+function normalize(text) {
+  return (text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function getProfileKey(label) {
   const text = normalize(label);
-  for (const key in FIELD_KEYWORDS) {
-    if (FIELD_KEYWORDS[key].some((k) => text.includes(k))) {
+
+  const entries = Object.entries(FIELD_KEYWORDS).sort(
+    (a, b) =>
+      Math.max(...b[1].map((k) => k.length)) -
+      Math.max(...a[1].map((k) => k.length))
+  );
+
+  for (const [key, keywords] of entries) {
+    if (keywords.some((k) => text.includes(k))) {
       return key;
     }
   }
   return null;
 }
 
-// handle google form dropdowns
 function fillDropdown(question, value) {
   const listbox = question.querySelector('[role="listbox"]');
   if (!listbox) return false;
@@ -108,11 +113,11 @@ function fillDropdown(question, value) {
   listbox.click();
 
   const target = normalize(value);
-  const options = Array.from(document.querySelectorAll('[role="option"]'));
+  const options = Array.from(question.querySelectorAll('[role="option"]'));
 
   for (const opt of options) {
-    const text = normalize(opt.innerText || opt.textContent);
-    if (text === target || text.includes(target)) {
+    const text = normalize(opt.innerText || "");
+    if (text === target || target.includes(text)) {
       opt.click();
       return true;
     }
@@ -120,126 +125,122 @@ function fillDropdown(question, value) {
   return false;
 }
 
-// fill a single question
-function fillQuestion(question, value) {
+function fillQuestion(question, value, key) {
   if (!value) return;
 
-  const date = question.querySelector("input[type='date']");
-  const radios = question.querySelectorAll('[role="radio"]');
-  const textarea = question.querySelector("textarea");
-  const textInput = question.querySelector(
-    "input[type='text'], input[type='email'], input[type='number'], input[type='url']"
-  );
+  if (key === "mobile") {
+    value = String(value).replace(/\D/g, "").slice(-10);
+  }
 
-  // date
+  if (key === "gender") {
+    const g = normalize(value);
+    if (g.startsWith("m")) value = "male";
+    if (g.startsWith("f")) value = "female";
+  }
+
+  const date = question.querySelector("input[type='date']");
   if (date) {
     date.value = value;
     date.dispatchEvent(new Event("input", { bubbles: true }));
     return;
   }
 
-  // dropdown
   if (fillDropdown(question, value)) return;
 
-  // radio buttons
+  const radios = question.querySelectorAll('[role="radio"]');
   if (radios.length) {
-    const target = normalize(String(value));
-
-    for (const r of radios) {
-      const optionText = normalize(
-        r.getAttribute("aria-label") || r.textContent
+    const target = normalize(value);
+    for (const radio of radios) {
+      const text = normalize(
+        radio.getAttribute("aria-label") || radio.textContent
       );
-
-      if (
-        optionText === target ||
-        optionText.includes(target) ||
-        target.includes(optionText)
-      ) {
-        r.click();
+      if (text === target || target.includes(text)) {
+        radio.click();
         return;
       }
     }
   }
 
-  // textarea
+  const textarea = question.querySelector("textarea");
   if (textarea) {
     textarea.value = value;
     textarea.dispatchEvent(new Event("input", { bubbles: true }));
     return;
   }
 
-  // text input
-  if (textInput) {
-    textInput.value = value;
-    textInput.dispatchEvent(new Event("input", { bubbles: true }));
+  const input = question.querySelector("input:not([type='file']), textarea");
+
+  if (input) {
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
   }
 }
 
-// auto-check "record email"
-function autoCheckEmail() {
-  document.querySelectorAll('[role="checkbox"]').forEach((cb) => {
-    const text = normalize(cb.parentElement?.innerText);
-    if (text.includes("record") && text.includes("email")) {
-      if (cb.getAttribute("aria-checked") === "false") cb.click();
-    }
-  });
-}
-
-// autofill entire form
-function autofill(profile) {
+function autofill(profile, customFields = []) {
   document.querySelectorAll(".Qr7Oae").forEach((question) => {
     const labelEl = question.querySelector(".M7eMe");
     if (!labelEl) return;
 
-    const key = getProfileKey(labelEl.innerText);
-    if (!key || !profile[key]) return;
+    const label = labelEl.innerText;
+    const key = getProfileKey(label);
 
-    fillQuestion(question, profile[key]);
+    if (key && profile[key]) {
+      fillQuestion(question, profile[key], key);
+      return;
+    }
+
+    for (const field of customFields) {
+      if (!field.value) continue;
+
+      const q = normalize(label);
+      const f = normalize(field.labelKeyword);
+
+      if (q.includes(f) || f.includes(q)) {
+        fillQuestion(question, field.value);
+        break;
+      }
+    }
   });
-
-  autoCheckEmail();
 }
 
 function resetGoogleForm() {
-  // reset text & textarea fields
   document.querySelectorAll("input, textarea").forEach((el) => {
     if (el.type === "file") return;
-
     el.value = "";
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
   });
 
-  // reset radio buttons
   document
     .querySelectorAll('[role="radio"][aria-checked="true"]')
-    .forEach((radio) => {
-      radio.click(); // real user-like toggle
-    });
+    .forEach((r) => r.click());
 
-  // reset checkboxes (including record email)
   document
     .querySelectorAll('[role="checkbox"][aria-checked="true"]')
-    .forEach((checkbox) => {
-      checkbox.click(); // REQUIRED
-    });
-
-  // reset dropdowns
-  document.querySelectorAll('[role="listbox"]').forEach((listbox) => {
-    const firstOption = listbox.querySelector('[role="option"]');
-    if (firstOption) firstOption.click();
-  });
+    .forEach((c) => c.click());
 }
 
-// listen from popup
-chrome.runtime.onMessage.addListener((req) => {
-  if (req.action === "FILL_FORM") {
-    chrome.storage.sync.get(["profile"], (res) => {
-      autofill(res.profile || {});
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "FILL_FORM") {
+    chrome.storage.sync.get(["profile", "customFields"], (result) => {
+      try {
+        autofill(result.profile || {}, result.customFields || []);
+        sendResponse({ success: true });
+      } catch (e) {
+        console.error(e);
+        sendResponse({ success: false });
+      }
     });
+    return true;
   }
 
-  if (req.action === "RESET_FORM") {
-    resetGoogleForm(); // ✅
+  if (request.action === "RESET_FORM") {
+    try {
+      resetGoogleForm();
+      sendResponse({ success: true });
+    } catch (e) {
+      sendResponse({ success: false });
+    }
+    return true;
   }
 });

@@ -2,7 +2,7 @@ export const FIELDS = [
   { key: "email", label: "email" },
   { key: "prn", label: "prn" },
   { key: "fullName", label: "full name" },
-  { key: "dob", label: "date of birth" },
+  { key: "dob", label: "date of birth (yyyy-mm-dd)" },
   { key: "mobile", label: "mobile number" },
   { key: "gender", label: "gender (male/female)" },
 

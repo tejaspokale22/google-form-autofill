@@ -1,12 +1,12 @@
 # Google Form Autofill
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Stars](https://img.shields.io/github/stars/yourusername/google-form-autofill?style=social)](https://github.com/tejaspokale22/google-form-autofill/stargazers)
+[![Forks](https://img.shields.io/github/forks/yourusername/google-form-autofill?style=social)](https://github.com/tejaspokale22/google-form-autofill/network/members)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Open Source](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://opensource.org/)
 
 A Chrome extension designed to streamline the process of filling out repetitive Google Forms. Save your information once and autofill it across similar forms with a single click.
-
-**This is an open source project** - contributions, issues, and feature requests are welcome!
 
 ## Table of Contents
 
@@ -44,7 +44,7 @@ A Chrome extension designed to streamline the process of filling out repetitive 
 
 Install directly from the Chrome Web Store:
 
-**[Add to Chrome - Google Form Autofill](#)** _(Link will be added upon publishing)_
+**[Add to Chrome - Google Form Autofill](https://chromewebstore.google.com/)**
 
 ### Manual Installation
 
@@ -394,7 +394,3 @@ This is an open source project maintained by the community. All contributions ar
 - Star the repository if you find it useful
 - Share with others who might benefit
 - Contribute code, documentation, or ideas
-
----
-
-**Note**: This extension is not affiliated with Google. Google Forms is a trademark of Google LLC.

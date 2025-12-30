@@ -43,7 +43,7 @@ A browser extension designed to streamline the process of filling out repetitive
 
 Install directly from the Microsoft Add-ons:
 
-**[Add to Microsoft Edge - Google Form Autofill](https://microsoftedge.microsoft.com/addons/detail/cbkbaoajmojgagkplfihcajkagokcnif)**
+**[Add to Microsoft Edge](https://microsoftedge.microsoft.com/addons/detail/cbkbaoajmojgagkplfihcajkagokcnif)**
 
 ### Manual Installation
 

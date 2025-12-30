@@ -5,7 +5,7 @@
 [![Forks](https://img.shields.io/github/forks/tejaspokale22/google-form-autofill?style=social)](https://github.com/tejaspokale22/google-form-autofill/network/members)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-A Chrome extension designed to streamline the process of filling out repetitive Google Forms. Save your information once and autofill it across similar forms with a single click.
+A browser extension designed to streamline the process of filling out repetitive Google Forms. Save your information once and autofill it across similar forms with a single click.
 
 ## Table of Contents
 
@@ -39,11 +39,11 @@ A Chrome extension designed to streamline the process of filling out repetitive 
 
 ## Installation
 
-### Chrome Web Store
+### Microsoft Add-ons
 
-Install directly from the Chrome Web Store:
+Install directly from the Microsoft Add-ons:
 
-**[Add to Chrome - Google Form Autofill](https://chromewebstore.google.com/)**
+**[Add to Microsoft Edge - Google Form Autofill](https://microsoftedge.microsoft.com/addons/detail/cbkbaoajmojgagkplfihcajkagokcnif)**
 
 ### Manual Installation
 
